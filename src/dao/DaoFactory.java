@@ -5,10 +5,15 @@
  */
 package dao;
 
+import interfaz.Signable;
+
 /**
  *
  * @author 2dam
  */
 public class DaoFactory {
     
+    public static Signable getSignable(){
+        return new DaoImplementation();
+    }
 }
