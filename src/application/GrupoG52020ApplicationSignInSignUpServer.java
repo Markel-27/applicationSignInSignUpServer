@@ -1,7 +1,7 @@
 /**
  * Contiene la aplicación del servidor de Base de datos usuarios
  */
-package grupog5.pkg2020.application.signin.signup.server;
+package application;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -25,6 +25,7 @@ public class GrupoG52020ApplicationSignInSignUpServer {
     private static Integer conexionesActuales = 0;
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
@@ -32,7 +33,7 @@ public class GrupoG52020ApplicationSignInSignUpServer {
         ServerSocket socketServidor;
         //Inicialización del serverSocket indicando puerto por el que escucha
         socketServidor = new ServerSocket(6500);//Numero de puerto guardado en config properties??
-        //Bucle infinito
+        //Bucle infinito, el servidor atiende todas las conexiones del lado cliente
         while (true){
             //Si hay conexiones disponibles.
             if(conexionesActuales < NUMERO_CONEXIONES_MAXIMAS){
@@ -43,6 +44,7 @@ public class GrupoG52020ApplicationSignInSignUpServer {
                 //Crear el hilo.
                 Worker worker = new Worker(unSocket);
             } 
+            //Cuando el hilo acaba actualizar la variable conexionesActuales, restar 1. 
             /*
             if(!worker.isAlive())
                conexionesActuales--; 

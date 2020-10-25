@@ -17,9 +17,9 @@ import java.util.Stack;
  */
 public class Pool {
     /**
-     * Un objeto pool satatico de la clase, solo existirá un pool.
+     * Un objeto pool statico de la clase, solo existirá un pool. Se inicializa. Solo accesible dentro de la clase.
      */
-    private static  Pool unPool = null;
+    private static  Pool unPool = new Pool();
     /**
      * Una pila que contendrá las conexiones al pool.
      */
@@ -42,38 +42,45 @@ public class Pool {
      * Constructor privado, solo accesible dentro de la clase. Inicializa la pila.
      */
     private Pool(){
+        //Inicializar la pila
         pilaContenedoraConexiones = new Stack();
+        //La longitud de la pila son el número de conexiones preestablecida en la clase principal del servidor
+        for(int i=0;i<=Integer.parseInt(fichero.getString("NumeroConexionesMaximas"));i++){
+            //Abrir una conexión.
+            this.openConnection();
+            //Introducir una conexión en la pila.
+            pilaContenedoraConexiones.push(con);
+        }
     }
     /**
-     * Accede una vez solo al constructor.
+     * Accede una vez solo al constructor. Es estático para que no se acceda con objetos se accede a traves de la clase
      * @return Una instacia del pool.
      */
     public static Pool getPool(){
-        //Si el pool está sin inicializar entra
-        if(unPool == null)
-            //Crea una instancia de la clase Pool. 
-            unPool = new Pool();
         return unPool;
     }
     
     /**
-     * Abre una conexión con la base de datos.
+     * Recoge una conexión de la pila. Utilizando el método pop de la clase Stack (pila)
      * @return Una conexion.
      */
     public Connection getConnection (){
+       //Retorna una conexión de la pila. La sacade la pila con pop.
        return (Connection) this.pilaContenedoraConexiones.pop();
     }
     
     /**
-     * Cierra una conexión con la base de datos.
+     * Devuelve una conexión a la pila con el método push de la clase Stack (Pila).
      */   
     public void freeConnection (){
+       //Introduce una conexión en la pila.
        this.pilaContenedoraConexiones.push(con);
     }
     //Meter las conexiones en el constructor en la pila?????
     private void openConnection() {
-        //Separar la insercion de datos del try catch lo primero una vez lo otro necesito 25 conexiones o las que me diga los hilos
+        //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
         fichero = ResourceBundle.getBundle("datosconexionbasededatos");
+        //Guardar la información del fichero de propiedades en os atributos de la clase.
         url = fichero.getString("Conn");
         user = fichero.getString("DBUser");
         passwd = fichero.getString("DBPass");

@@ -15,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import mensaje.Mensaje;
@@ -29,7 +30,7 @@ public class Worker extends Thread implements Serializable{
      * Atributo Logger para rastrear los pasos de ejecución del programa.
      */
     private static final Logger LOGGER = 
-            Logger.getLogger("grupog5.signinsignupapplication.cliente.application");
+            Logger.getLogger("grupog5.signinsignupapplication.servidor.worker.thread");
     private Socket socketWorker;
     
     public Worker (Socket socket){
@@ -61,6 +62,8 @@ public class Worker extends Thread implements Serializable{
         } catch (ExcepcionUserNoExiste ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ExcepcionUserYaExiste ex) {
+            Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -35,27 +35,28 @@ public class DaoImplementation implements Signable {
      */
     private Pool pool = Pool.getPool();
     /**
-     * 
+     * Un PreparedStatement
      */
     private PreparedStatement stmt = null;
     /**
-     * 
+     * Una conexión
      */
     private Connection con = null;
     /**
-     * 
+     * Consulta si el la base de datos usuario existe el login 
      */
     private final String CONSULTAR_SI_LOGIN_ESTA = "Select * from usuario where login = ?";
     /**
-     * 
+     * Consulta si hay un usuario con el login y la contraseña indicados.
      */
     private final String CONSULTAR_SI_ESTA_USUARIO = "Select * from usuario where login = ? and password = ?";
     /**
-     * 
+     * Insertar un nuevo usuario.
      */
-    private final String INSERTAR_USUARIO = "Insert into usuario () values (?,?,?,?,?,?,?)";
+    private final String INSERTAR_USUARIO = "Insert into usuario (login,email,fullName,status,privilege,password,lastAccess,lastPasswordChange)"
+            + " values (?,?,?,?,?,?,?,?)";
     /**
-     * 
+     * Actualizar la fecha de´la última entrada de un usuario.
      */
     private final String ACTUALIZAR_ULTIMA_ENTRADA_USUARIO = "Update usuario set lastAccess = ? where login = ? and password = ?";
     
@@ -73,15 +74,29 @@ public class DaoImplementation implements Signable {
         LOGGER.log(Level.INFO, "Método signin del dao");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
         con = pool.getConnection();
-        //Guardar en el atributo de tipo Statement una conexión de busqueda de un usuario.
-        stmt = con.prepareStatement(CONSULTAR_SI_ESTA_USUARIO);
+        //Guardar en el atributo de tipo Statement una conexión de busqueda de si el nombre de usuario está.
+        stmt = con.prepareStatement(CONSULTAR_SI_LOGIN_ESTA);
         //Añadir las variable login del user al statement
         stmt.setString(1, user.getLogin());
-        //Añadir las variable password del user al statement
-        stmt.setString(2, user.getPassword());
+        //Guardar en el atributo de tipo Statement una conexión de busqueda de un usuario.
         ResultSet rs = stmt.executeQuery();
+        //Si no devuelve nada el login no existe en la base de datos
         if(rs.next()==false)
+            //Lanzar excepción user no existe
             throw new ExcepcionUserNoExiste(); 
+        //Si no el login existe mirar si coincide el login y la contraseña
+        else{
+           stmt = con.prepareStatement(CONSULTAR_SI_ESTA_USUARIO);
+            //Añadir las variable login del user al statement
+            stmt.setString(1, user.getLogin());
+            //Añadir las variable password del user al statement
+            stmt.setString(2, user.getPassword());
+            rs = stmt.executeQuery(); 
+            //Si no hay resultados
+            if(rs.next()==false)
+                //Lanzar excepción contraseña incorrecta
+                throw new ExcepcionPasswdIncorrecta(); 
+        }        
         //Liberar la conexión
         pool.freeConnection();
         return user;
@@ -93,12 +108,23 @@ public class DaoImplementation implements Signable {
      * @throws ExcepcionUserYaExiste 
      */
     @Override
-    public synchronized void signUp(User user) throws ExcepcionUserYaExiste {
+    public synchronized void signUp(User user) throws ExcepcionUserYaExiste{
         //Mensaje logger entrada de método signUp.
         LOGGER.log(Level.INFO, "Método signup del dao");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
         con = pool.getConnection();
+        stmt = con.prepareStatement(INSERTAR_USUARIO);
+        //Añadir los valores al statement
+        stmt.setString(1, user.getLogin());
+        stmt.setString(2, user.getEmail());
+        stmt.setString(3, user.getFullName());
+        stmt.setObject(4, user.getStatus());
+        stmt.setObject(5, user.getPrivilege());
+        stmt.setString(6, user.getPassword());
+        stmt.setTimestamp(7,Timestamp.valueOf(LocalDateTime.now()));
+        stmt.setTimestamp(8,Timestamp.valueOf(LocalDateTime.now()));
         
+        pool.freeConnection();
     }
 
     /**
