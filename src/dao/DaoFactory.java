@@ -1,19 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Contiene el Dao (Data Access Object) de la aplicación.
  */
 package dao;
 
 import interfaz.Signable;
 
 /**
- *
- * @author 2dam
+ * Factoria de la Interface Signable.
+ * @version 1.0
+ * @since 26/10/2020
+ * @author Eneko, Endika, Markel
  */
 public class DaoFactory {
-    
+    /**
+     * Recoge una instancia de la clase que implementa la interface.
+     * @return Un Signable. 
+     */
     public static Signable getSignable(){
+        //Retorna la interfaz pero como la clase implemeta la interfaz.
         return new DaoImplementation();
     }
 }

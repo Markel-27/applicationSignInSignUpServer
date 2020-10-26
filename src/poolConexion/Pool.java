@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Pool de conexión con la base de datos.
@@ -16,6 +18,11 @@ import java.util.Stack;
  * @author Eneko, Endika, Markel
  */
 public class Pool {
+    /**
+     * Atributo Logger para rastrear los pasos de ejecución del programa.
+     */
+    private static final Logger LOGGER = 
+            Logger.getLogger("grupog5.signinsignupapplication.servidor.pooldeconexiones");
     /**
      * Un objeto pool statico de la clase, solo existirá un pool. Se inicializa. Solo accesible dentro de la clase.
      */
@@ -32,16 +39,29 @@ public class Pool {
      * Una conexión a la BBDD.
      */
     private Connection con = null;
-    
+    /**
+     * Atributo que almacena la url de la base de datos.
+     */
     private String url;
+    /**
+     * Atributo que almacena el usuario para acceder a la base de datos.
+     */
     private String user;
+    /**
+     * Atributo que almacena la contraseña de acceso a la base de datos.
+     */
     private String passwd;
+    /**
+     * Atributo que almacena el driver de la base de datos.
+     */
     private String driver;
     
     /**
      * Constructor privado, solo accesible dentro de la clase. Inicializa la pila.
      */
     private Pool(){
+        //Se supone que solo entra una vez aqui. Veremos.
+        LOGGER.log(Level.INFO, "Método constructor del pool");
         //Inicializar la pila
         pilaContenedoraConexiones = new Stack();
         //La longitud de la pila son el número de conexiones preestablecida en la clase principal del servidor
@@ -65,6 +85,8 @@ public class Pool {
      * @return Una conexion.
      */
     public Connection getConnection (){
+        //Método del pool que el dao le pide una conexión
+        LOGGER.log(Level.INFO, "Método getConnection del pool");
        //Retorna una conexión de la pila. La sacade la pila con pop.
        return (Connection) this.pilaContenedoraConexiones.pop();
     }
@@ -73,11 +95,13 @@ public class Pool {
      * Devuelve una conexión a la pila con el método push de la clase Stack (Pila).
      */   
     public void freeConnection (){
+        LOGGER.log(Level.INFO, "Método freeConnection del pool");
        //Introduce una conexión en la pila.
        this.pilaContenedoraConexiones.push(con);
     }
     //Meter las conexiones en el constructor en la pila?????
     private void openConnection() {
+        LOGGER.log(Level.INFO, "Método openConnection del pool");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
         fichero = ResourceBundle.getBundle("datosconexionbasededatos");
         //Guardar la información del fichero de propiedades en os atributos de la clase.

@@ -1,5 +1,5 @@
 /**
- * Contiene el dao.
+ * Contiene el Dao (Data Access Object) de la aplicación.
  */
 package dao;
 
@@ -21,10 +21,10 @@ import user.User;
 /**
  * Realiza las consultas a la BBDD.
  * @version 1.0
+ * @since 23/10/2020
  * @author Eneko, Endika, Markel
  */
-public class DaoImplementation implements Signable {
-    
+public class DaoImplementation implements Signable {   
     /**
      * Atributo Logger para rastrear los pasos de ejecución del programa.
      */
@@ -69,7 +69,7 @@ public class DaoImplementation implements Signable {
      * @throws SQLException 
      */
     @Override
-    public synchronized User signIn(User user) throws ExcepcionPasswdIncorrecta, ExcepcionUserNoExiste,SQLException {
+    public synchronized User signIn(User user) throws ExcepcionPasswdIncorrecta, ExcepcionUserNoExiste,Exception {
         //Mensaje logger entrada de método signIn.
         LOGGER.log(Level.INFO, "Método signin del dao");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
@@ -85,8 +85,8 @@ public class DaoImplementation implements Signable {
             //Lanzar excepción user no existe
             throw new ExcepcionUserNoExiste(); 
         //Si no el login existe mirar si coincide el login y la contraseña
-        else{
-           stmt = con.prepareStatement(CONSULTAR_SI_ESTA_USUARIO);
+         else{
+            stmt = con.prepareStatement(CONSULTAR_SI_ESTA_USUARIO);
             //Añadir las variable login del user al statement
             stmt.setString(1, user.getLogin());
             //Añadir las variable password del user al statement
@@ -96,7 +96,7 @@ public class DaoImplementation implements Signable {
             if(rs.next()==false)
                 //Lanzar excepción contraseña incorrecta
                 throw new ExcepcionPasswdIncorrecta(); 
-        }        
+         }              
         //Liberar la conexión
         pool.freeConnection();
         return user;
@@ -108,7 +108,7 @@ public class DaoImplementation implements Signable {
      * @throws ExcepcionUserYaExiste 
      */
     @Override
-    public synchronized void signUp(User user) throws ExcepcionUserYaExiste{
+    public synchronized void signUp(User user) throws ExcepcionUserYaExiste,Exception{
         //Mensaje logger entrada de método signUp.
         LOGGER.log(Level.INFO, "Método signup del dao");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
@@ -123,7 +123,9 @@ public class DaoImplementation implements Signable {
         stmt.setString(6, user.getPassword());
         stmt.setTimestamp(7,Timestamp.valueOf(LocalDateTime.now()));
         stmt.setTimestamp(8,Timestamp.valueOf(LocalDateTime.now()));
-        
+        //El prepared stamtement ejecuta la instrucción un insert en este caso.
+        stmt.executeUpdate();
+        //Liberar la conexión, devuelve la coneción a la pila del pool.
         pool.freeConnection();
     }
 
