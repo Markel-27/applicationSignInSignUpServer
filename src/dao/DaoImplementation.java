@@ -5,10 +5,19 @@
  */
 package dao;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import poolConexion.Pool;
+
 /**
  *
  * @author 2dam
  */
-public class DaoImplementation {
+public class DaoImplementation {    
+    
+    //Accede a la conexion a la clase Pool 
+    private Connection getConnection() throws SQLException {
+        return Pool.getConexion();
+    }
     
 }
