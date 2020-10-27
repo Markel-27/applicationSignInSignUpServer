@@ -26,11 +26,11 @@ public class GrupoG52020ApplicationSignInSignUpServer {
     /**
      * Leer los datos del fichero properties con la información de la base de datos.
      */
-    private ResourceBundle fichero = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
+    private static final ResourceBundle FICHERO = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
     /**
      * Indica el número máximo de conexiones posibles al servidor. El dato está guardado en un fichero de propiedades en el paquete poolConexion.
      */
-    private static final Integer NUMERO_CONEXIONES_MAXIMAS = 25;//Integer.parseInt(fichero.getString("NumeroConexionesMaximas"));
+    private static final Integer NUMERO_CONEXIONES_MAXIMAS = Integer.parseInt(FICHERO.getString("NumeroConexionesMaximas"));
     /**
      * Número de conexiones activas, controlar que no superen las máximas preestablecidas.
      */
@@ -58,7 +58,7 @@ public class GrupoG52020ApplicationSignInSignUpServer {
         while (true){
             LOGGER.log(Level.INFO, "Bucle infinito del servidor atendiendo consultas de clientes.");
             //Si hay conexiones disponibles.
-            if(conexionesActuales < NUMERO_CONEXIONES_MAXIMAS){
+            if(NUMERO_CONEXIONES_MAXIMAS > conexionesActuales ){
                 //Acepta el server socket una conexión y traslada la atención de esa conexión a un socket.
                 Socket unSocket = socketServidor.accept();
                 //Sumar la conexión actual al atributo que controla las conexiones activas.

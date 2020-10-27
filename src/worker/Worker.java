@@ -59,7 +59,7 @@ public class Worker extends Thread implements Serializable{
         //Clase para escribir objetos. Y enviarlos a traves del socket.
         ObjectOutputStream oos=null;
         //Leer un mensaje recibido. Castear el objeto a Mensaje. ClassNot FoundException da esto.
-        Mensaje mensaje=new Mensaje(user,Accion.OK);
+        Mensaje mensaje; //=new Mensaje(user,Accion.OK)
         //Entrada salida de datos.
         try {
             //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviado a traves de un socket.
