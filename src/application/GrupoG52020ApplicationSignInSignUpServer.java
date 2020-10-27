@@ -24,9 +24,13 @@ public class GrupoG52020ApplicationSignInSignUpServer {
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.application");
     /**
-     * Indica el número máximo de conexiones posibles al servidor.
+     * Leer los datos del fichero properties con la información de la base de datos.
      */
-    private final static Integer NUMERO_CONEXIONES_MAXIMAS = 25;
+    private ResourceBundle fichero = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
+    /**
+     * Indica el número máximo de conexiones posibles al servidor. El dato está guardado en un fichero de propiedades en el paquete poolConexion.
+     */
+    private static final Integer NUMERO_CONEXIONES_MAXIMAS = 25;//Integer.parseInt(fichero.getString("NumeroConexionesMaximas"));
     /**
      * Número de conexiones activas, controlar que no superen las máximas preestablecidas.
      */
@@ -61,12 +65,11 @@ public class GrupoG52020ApplicationSignInSignUpServer {
                 conexionesActuales++;
                 //Crear el hilo.
                 Worker worker = new Worker(unSocket);
+                //Cuando el hilo acaba, actualizar la variable conexionesActuales, restar 1. 
+                if(!worker.isAlive())
+                    conexionesActuales--;     
             } 
-            //Cuando el hilo acaba actualizar la variable conexionesActuales, restar 1. 
-            /*
-            if(!worker.isAlive())
-               conexionesActuales--; 
-            */          
+                 
         }
     }
     
