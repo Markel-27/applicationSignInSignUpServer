@@ -65,12 +65,6 @@ public class Pool {
         //Inicializar la pila
         pilaContenedoraConexiones = new Stack();
         //La longitud de la pila son el número de conexiones preestablecida en la clase principal del servidor
-        for(int i=0;i<=Integer.parseInt(fichero.getString("NumeroConexionesMaximas"));i++){
-            //Abrir una conexión.
-            this.openConnection();
-            //Introducir una conexión en la pila.
-            pilaContenedoraConexiones.push(con);
-        }
     }
     /**
      * Accede una vez solo al constructor. Es estático para que no se acceda con objetos se accede a traves de la clase
@@ -87,6 +81,13 @@ public class Pool {
     public Connection getConnection (){
         //Método del pool que el dao le pide una conexión
         LOGGER.log(Level.INFO, "Método getConnection del pool");
+        //Pedir una conexión a la pila si está vacá añadir una
+        if(pilaContenedoraConexiones.isEmpty()){
+            //Abrir una conexión.
+            this.openConnection();
+            //Introducir una conexión en la pila.
+            pilaContenedoraConexiones.push(con);
+        }
        //Retorna una conexión de la pila. La sacade la pila con pop.
        return (Connection) this.pilaContenedoraConexiones.pop();
     }

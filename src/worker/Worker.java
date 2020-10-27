@@ -60,7 +60,9 @@ public class Worker extends Thread implements Serializable{
         ObjectOutputStream oos=null;
         //Leer un mensaje recibido. Castear el objeto a Mensaje. ClassNot FoundException da esto.
         Mensaje mensaje; //=new Mensaje(user,Accion.OK)
-        //Entrada salida de datos.
+        //Vamos a usar una instancia de mensaje diferente para el reenvio.
+        Mensaje mensajeAEnviar = new Mensaje();
+        //Try catch capturar los posibles errores cuando hay una consulta en la base de datos.
         try {
             //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviado a traves de un socket.
             ois = new ObjectInputStream(socketWorker.getInputStream());
@@ -70,81 +72,66 @@ public class Worker extends Thread implements Serializable{
             mensaje = (Mensaje) ois.readObject();
             //Guardar en el atributo user el usuario leido en el mensaje.
             user = mensaje.getUser();
-            //Estudiar las distintas opciones del mensaje recibido
+            //Estudiar las distintas opciones del mensaje recibido, hay 3 opciones Signin signup logout
             switch(mensaje.getAccion()){
                 //Caso de que la acción a realizar sea un SignIn
                 case SIGNIN:
-                    try{
-                        //Llamada al método signIn del Dao. Devuelve un user.
-                        user = dao.signIn(mensaje.getUser());
-                        //Indicar en el mensaje que todo ha salido bien
-                        mensaje.setAccion(Accion.OK);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                        break;
-                    }catch(ExcepcionPasswdIncorrecta e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.PASSWORD_INCORRECTA);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }catch(ExcepcionUserNoExiste e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.USUARIO_NO_EXISTE);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }catch(Exception e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.TIEMPO_EXPIRADO);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }
+                    //Llamada al método signIn del Dao. Devuelve un user.
+                    user = dao.signIn(mensaje.getUser());
+                    //Indicar en el mensaje que todo ha salido bien
+                    mensajeAEnviar.setAccion(Accion.OK);
+                    mensajeAEnviar.setUser(user);
+                    break;   
                 //Caso de que la acción a realizar sea un SignUp
                 case SIGNUP:
-                    try{
-                        //Llamada al método signIn del Dao.
-                        dao.signUp(mensaje.getUser());
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                        break;
-                    }catch(ExcepcionUserYaExiste e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.USUARIO_YA_EXISTE);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }catch(Exception e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.TIEMPO_EXPIRADO);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }
+                    //Llamada al método signIn del Dao.
+                    dao.signUp(mensaje.getUser());
+                    //Indicar en el mensaje que todo ha salido bien
+                    mensajeAEnviar.setAccion(Accion.OK);
+                    break;
                 default:
-                    try{
-                        //Llamada al método logOut del Dao.
-                        dao.logOut(mensaje.getUser()); 
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                        break;
-                    }catch(Exception e){
-                        //Se ha producido un error indicar en el mensaje
-                        mensaje.setAccion(Accion.TIEMPO_EXPIRADO);
-                        //Escribir en el socket el mensaje.
-                        oos.writeObject(mensaje);
-                    }
+                    //Llamada al método logOut del Dao.
+                    dao.logOut(mensaje.getUser());
+                    //Indicar en el mensaje que todo ha salido bien
+                    mensajeAEnviar.setAccion(Accion.OK);
+                    break;
             }
-        //Catch Errores entrada salida de datos
+        //Tratar las excepciones la base de datos puede lanzar las tres que hemos creado mas las existentes las englobamos con exception que es la padre.
+        }catch(ExcepcionPasswdIncorrecta e){
+            //Se ha producido un error indicar en el mensaje
+            mensajeAEnviar.setAccion(Accion.PASSWORD_INCORRECTA);
+        }catch(ExcepcionUserYaExiste e){
+            //Se ha producido un error indicar en el mensaje
+            mensajeAEnviar.setAccion(Accion.USUARIO_YA_EXISTE);
+        }catch(ExcepcionUserNoExiste e){
+            //Se ha producido un error indicar en el mensaje
+            mensajeAEnviar.setAccion(Accion.USUARIO_NO_EXISTE);
+        }catch(Exception e){
+            //Se ha producido un error indicar en el mensaje
+            mensajeAEnviar.setAccion(Accion.TIEMPO_EXPIRADO);
+        }
+        //Ahora enviar el mensaje a la aplicación cliente.
+        try{
+            //Antes de enviar el mensaje igual es una cutrez pero tengo que inicializar user si no lo está.
+            if(user == null){
+                user = new User();
+            }
+            mensajeAEnviar.setUser(user);
+           //Escribir en el socket el mensaje.          
+            oos.writeObject(mensajeAEnviar);
         }catch(IOException e){
              LOGGER.log(Level.INFO, "Catch de esntada salida reenvio de mensaje de servidor a cliente.");
-        }catch(Exception e){
-             LOGGER.log(Level.INFO, "Catch de reenvio de mensaje de servidor a cliente.");
-        }//Cerrar los Streams
+        }
+        //Cerrar los Streams
         finally{
             //Dentro de try catch dan error de IOException
             try{
-            oos.close();
-            ois.close();
-        }catch(IOException e){
-            LOGGER.log(Level.INFO, "Catch cerrando los Output/Input stream.");
-        }
-        }       
+                oos.close();
+                ois.close();
+            }catch(IOException e){
+                LOGGER.log(Level.INFO, "Catch cerrando los Output/Input stream.");
+            }
+        } 
+        
     }
 }
