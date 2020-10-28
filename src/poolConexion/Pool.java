@@ -24,7 +24,7 @@ public class Pool {
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.pooldeconexiones");
     /**
-     * Un objeto pool statico de la clase, solo existirá un pool. Se inicializa. Solo accesible dentro de la clase.
+     * Un objeto pool statico de la clase, solo existirá un pool. Se inicializa.
      */
     private static  Pool unPool = new Pool();
     /**

@@ -65,9 +65,14 @@ public class GrupoG52020ApplicationSignInSignUpServer {
                 conexionesActuales++;
                 //Crear el hilo.
                 Worker worker = new Worker(unSocket);
-                //Cuando el hilo acaba, actualizar la variable conexionesActuales, restar 1. 
-                if(!worker.isAlive())
-                    conexionesActuales--;     
+                //Hacer un join al thread para que este programa espere a que el thread acabe para seguir.
+                try{
+                    worker.join();
+                }catch(InterruptedException e){
+                    LOGGER.log(Level.SEVERE, "Error de interrupción del hilo.");
+                }               
+                //El thread acaba, actualizar variable conexionesActuales.
+                conexionesActuales--;
             } 
                  
         }
