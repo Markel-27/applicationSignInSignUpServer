@@ -31,19 +31,19 @@ public class DaoImplementation implements Signable {
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.daoImplementation");
     /**
-     * 
+     * Atributo que es un pool. Un poo que va a ser una pila con conexiones a la Base de datos.
      */
     private Pool pool = Pool.getPool();
     /**
-     * Un PreparedStatement
+     * Un PreparedStatement. Para realizar las querys a la base de datos.
      */
     private PreparedStatement stmt = null;
     /**
-     * Una conexión
+     * Una conexión.
      */
     private Connection con = null;
     /**
-     * Consulta si el la base de datos usuario existe el login 
+     * Consulta si en la base de datos usuario existe el login 
      */
     private final String CONSULTAR_SI_LOGIN_ESTA = "Select * from usuario where login = ?";
     /**
@@ -110,7 +110,7 @@ public class DaoImplementation implements Signable {
     @Override
     public synchronized void signUp(User user) throws ExcepcionUserYaExiste,Exception{
         //Mensaje logger entrada de método signUp.
-        LOGGER.log(Level.INFO, "Método signup del dao");
+        LOGGER.log(Level.INFO, "Método signup del DaoImplementation");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
         con = pool.getConnection();
         stmt = con.prepareStatement(INSERTAR_USUARIO);
@@ -137,7 +137,7 @@ public class DaoImplementation implements Signable {
     @Override
     public synchronized void logOut(User user) throws SQLException{
         //Mensaje logger entrada de método logout.
-        LOGGER.log(Level.INFO, "Método logout");
+        LOGGER.log(Level.INFO, "Método logout del Daoimplementation");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
         con = pool.getConnection();
         //Guardar en el atributo de tipo Statement una conexión de actualizar fecha salida.

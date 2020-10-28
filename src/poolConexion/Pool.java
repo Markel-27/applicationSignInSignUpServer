@@ -24,38 +24,18 @@ public class Pool {
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.pooldeconexiones");
     /**
-     * Un objeto pool statico de la clase, solo existirá un pool. Se inicializa.
+     * Un objeto pool statico de la clase, solo existirá un pool. Este atributo me asegura que solo se crea uno.
      */
-    private static  Pool unPool = new Pool();
+    private static  Pool unPool;
     /**
      * Una pila que contendrá las conexiones al pool.
      */
     private Stack pilaContenedoraConexiones;
     /**
-     * Leer los datos del fichero properties con la información de la base de datos.
-     */
-    private ResourceBundle fichero;
-    /**
      * Una conexión a la BBDD.
      */
     private Connection con = null;
-    /**
-     * Atributo que almacena la url de la base de datos.
-     */
-    private String url;
-    /**
-     * Atributo que almacena el usuario para acceder a la base de datos.
-     */
-    private String user;
-    /**
-     * Atributo que almacena la contraseña de acceso a la base de datos.
-     */
-    private String passwd;
-    /**
-     * Atributo que almacena el driver de la base de datos.
-     */
-    private String driver;
-    
+
     /**
      * Constructor privado, solo accesible dentro de la clase. Inicializa la pila.
      */
@@ -64,13 +44,14 @@ public class Pool {
         LOGGER.log(Level.INFO, "Método constructor del pool");
         //Inicializar la pila
         pilaContenedoraConexiones = new Stack();
-        //La longitud de la pila son el número de conexiones preestablecida en la clase principal del servidor
     }
     /**
-     * Accede una vez solo al constructor. Es estático para que no se acceda con objetos se accede a traves de la clase
-     * @return Una instacia del pool.
+     * Accede al constructor. Es estático para que no se acceda con objetos se accede a traves de la clase
+     * @return Una instacia del pool. Menos la primera vez nunca entra en el constructor.
      */
     public static Pool getPool(){
+        if(Pool.unPool==null)
+            unPool = new Pool();
         return unPool;
     }
     
@@ -81,7 +62,7 @@ public class Pool {
     public Connection getConnection (){
         //Método del pool que el dao le pide una conexión
         LOGGER.log(Level.INFO, "Método getConnection del pool");
-        //Pedir una conexión a la pila si está vacá añadir una
+        //Pedir una conexión a la pila si está vacá añadir una.
         if(pilaContenedoraConexiones.isEmpty()){
             //Abrir una conexión.
             this.openConnection();
@@ -104,12 +85,12 @@ public class Pool {
     private void openConnection() {
         LOGGER.log(Level.INFO, "Método openConnection del pool");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
-        fichero = ResourceBundle.getBundle("datosconexionbasededatos");
+        ResourceBundle fichero = ResourceBundle.getBundle("datosconexionbasededatos");
         //Guardar la información del fichero de propiedades en os atributos de la clase.
-        url = fichero.getString("Conn");
-        user = fichero.getString("DBUser");
-        passwd = fichero.getString("DBPass");
-        driver = fichero.getString("Driver");
+        String url = fichero.getString("Conn");
+        String user = fichero.getString("DBUser");
+        String passwd = fichero.getString("DBPass");
+        String driver = fichero.getString("Driver");
         try{
             Class.forName(driver);
             con = DriverManager.getConnection(url,user,passwd);
