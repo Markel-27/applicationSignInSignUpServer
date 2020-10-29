@@ -119,8 +119,8 @@ public class DaoImplementation implements Signable {
         stmt.setString(1, user.getLogin());
         stmt.setString(2, user.getEmail());
         stmt.setString(3, user.getFullName());
-        stmt.setObject(4, user.getStatus());
-        stmt.setObject(5, user.getPrivilege());
+        stmt.setString(4, user.getStatus().name());
+        stmt.setString(5, user.getPrivilege().name());
         stmt.setString(6, user.getPassword());
         stmt.setTimestamp(7,Timestamp.valueOf(LocalDateTime.now()));
         stmt.setTimestamp(8,Timestamp.valueOf(LocalDateTime.now()));
