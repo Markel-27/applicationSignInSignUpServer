@@ -66,8 +66,7 @@ public class Worker extends Thread implements Serializable{
         try {
             //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviado a traves de un socket.
             ois = new ObjectInputStream(socketWorker.getInputStream());
-            //Clase para escribir objetos. Y enviarlos a traves del socket.
-            oos = new ObjectOutputStream(socketWorker.getOutputStream());
+            
             //Leer un mensaje recibido. Castear el objeto a Mensaje. ClassNot FoundException da esto.
             mensajeRecibido = (Mensaje) ois.readObject();
             //Guardar en el atributo user el usuario leido en el mensaje.
@@ -90,13 +89,14 @@ public class Worker extends Thread implements Serializable{
                     dao.signUp(user);
                     //Indicar en el mensaje que todo ha salido bien
                     mensajeAEnviar.setAccion(Accion.OK);
+                    mensajeAEnviar.setUser(user);
                     break;
                 default:
                     LOGGER.log(Level.INFO, "Recibida petición LogOut");
                     //Llamada al método logOut del Dao.
                     dao.logOut(user);
                     //Indicar en el mensaje que todo ha salido bien
-                    mensajeAEnviar.setAccion(Accion.OK);
+                    mensajeAEnviar.setAccion(Accion.OK);                  
                     break;
             }
         //Tratar las excepciones la base de datos puede lanzar las tres que hemos creado mas las existentes las englobamos con exception que es la padre.
@@ -119,12 +119,9 @@ public class Worker extends Thread implements Serializable{
         }
         //Ahora enviar el mensaje a la aplicación cliente.
         try{
-            //Antes de enviar el mensaje igual es una cutrez pero tengo que inicializar user si no lo está.
-            if(user == null){
-                user = new User();
-            }
-            mensajeAEnviar.setUser(user);
-           //Escribir en el socket el mensaje que va a ir al socket del cliente.          
+            //Clase para escribir objetos. Y enviarlos a traves del socket.
+            oos = new ObjectOutputStream(socketWorker.getOutputStream());
+           //Escribir en el socket el mensaje que va a ir al socket del cliente.
             oos.writeObject(mensajeAEnviar);
         }catch(IOException e){
              LOGGER.log(Level.INFO, "Catch de esntada salida reenvio de mensaje de servidor a cliente.");

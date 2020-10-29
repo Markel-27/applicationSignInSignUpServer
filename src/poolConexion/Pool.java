@@ -50,6 +50,7 @@ public class Pool {
      * @return Una instacia del pool. Menos la primera vez nunca entra en el constructor.
      */
     public static Pool getPool(){
+        LOGGER.log(Level.INFO, "Método getPool del pool. Solo una instancia");
         if(Pool.unPool==null)
             unPool = new Pool();
         return unPool;
@@ -77,7 +78,7 @@ public class Pool {
      * Devuelve una conexión a la pila con el método push de la clase Stack (Pila).
      */   
     public void freeConnection (){
-        LOGGER.log(Level.INFO, "Método freeConnection del pool");
+        LOGGER.log(Level.INFO, "Método freeConnection del pool. Liberar conexión, devolver a la pila");
        //Introduce una conexión en la pila.
        this.pilaContenedoraConexiones.push(con);
     }
@@ -85,7 +86,7 @@ public class Pool {
     private void openConnection() {
         LOGGER.log(Level.INFO, "Método openConnection del pool.");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
-        ResourceBundle fichero = ResourceBundle.getBundle("datosconexionbasededatos");
+        ResourceBundle fichero = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
         //Guardar la información del fichero de propiedades en os atributos de la clase.
         String url = fichero.getString("Conn");
         String user = fichero.getString("DBUser");
@@ -95,7 +96,7 @@ public class Pool {
             Class.forName(driver);
             con = DriverManager.getConnection(url,user,passwd);
         }catch(ClassNotFoundException | SQLException e){
-            System.out.println("No se conecta");
+            LOGGER.log(Level.INFO, "Catch metodo openConnection del pool.");
         }
     }
 }
