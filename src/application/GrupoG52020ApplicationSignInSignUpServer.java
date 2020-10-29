@@ -41,7 +41,6 @@ public class GrupoG52020ApplicationSignInSignUpServer {
      */
     private static final Integer NUMERO_PUERTO = 
             Integer.parseInt(ResourceBundle.getBundle("socket.infoSocket").getString("portNumber"));
-    
     /**
      * @param args the command line arguments
      * @throws java.io.IOException

@@ -83,7 +83,7 @@ public class Pool {
     }
     //Meter las conexiones en el constructor en la pila?????
     private void openConnection() {
-        LOGGER.log(Level.INFO, "Método openConnection del pool");
+        LOGGER.log(Level.INFO, "Método openConnection del pool.");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
         ResourceBundle fichero = ResourceBundle.getBundle("datosconexionbasededatos");
         //Guardar la información del fichero de propiedades en os atributos de la clase.

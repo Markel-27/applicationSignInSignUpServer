@@ -84,7 +84,7 @@ public class DaoImplementation implements Signable {
         if(rs.next()==false)
             //Lanzar excepción user no existe
             throw new ExcepcionUserNoExiste(); 
-        //Si no el login existe mirar si coincide el login y la contraseña
+        //Si no, el login existe mirar si coincide el login y la contraseña
          else{
             stmt = con.prepareStatement(CONSULTAR_SI_ESTA_USUARIO);
             //Añadir las variable login del user al statement
@@ -93,10 +93,11 @@ public class DaoImplementation implements Signable {
             stmt.setString(2, user.getPassword());
             rs = stmt.executeQuery(); 
             //Si no hay resultados
-            if(rs.next()==false)
+            if(rs.next()==false){
                 //Lanzar excepción contraseña incorrecta
                 throw new ExcepcionPasswdIncorrecta(); 
-         }              
+            }             
+        }
         //Liberar la conexión
         pool.freeConnection();
         return user;
