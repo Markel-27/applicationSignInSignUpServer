@@ -114,18 +114,31 @@ public class DaoImplementation implements Signable {
         LOGGER.log(Level.INFO, "Método signup del DaoImplementation");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
         con = pool.getConnection();
-        stmt = con.prepareStatement(INSERTAR_USUARIO);
-        //Añadir los valores al statement
+        //Guardar en el atributo de tipo Statement una conexión de busqueda de si el nombre de usuario está.
+        stmt = con.prepareStatement(CONSULTAR_SI_LOGIN_ESTA);
+        //Añadir las variable login del user al statement
         stmt.setString(1, user.getLogin());
-        stmt.setString(2, user.getEmail());
-        stmt.setString(3, user.getFullName());
-        stmt.setObject(4, user.getStatus());
-        stmt.setObject(5, user.getPrivilege());
-        stmt.setString(6, user.getPassword());
-        stmt.setTimestamp(7,Timestamp.valueOf(LocalDateTime.now()));
-        stmt.setTimestamp(8,Timestamp.valueOf(LocalDateTime.now()));
-        //El prepared stamtement ejecuta la instrucción un insert en este caso.
-        stmt.executeUpdate();
+        //Guardar en el atributo de tipo Statement una conexión de busqueda de un usuario.
+        ResultSet rs = stmt.executeQuery();
+        //Si rs ( resultado de la query) no es vacío, hay en la Base de datos un usuario con el login.
+        if(rs.next())
+            //Lanzar excepción user no existe
+            throw new ExcepcionUserYaExiste(); 
+        else{
+            stmt = con.prepareStatement(INSERTAR_USUARIO);
+            //Añadir los valores al statement
+            stmt.setString(1, user.getLogin());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getFullName());
+            stmt.setString(4, user.getStatus().name());
+            stmt.setString(5, user.getPrivilege().name());
+            stmt.setString(6, user.getPassword());
+            stmt.setTimestamp(7,Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(8,Timestamp.valueOf(LocalDateTime.now()));
+            //El prepared stamtement ejecuta la instrucción un insert en este caso.
+            stmt.executeUpdate();
+        }
+        
         //Liberar la conexión, devuelve la coneción a la pila del pool.
         pool.freeConnection();
     }
@@ -136,7 +149,7 @@ public class DaoImplementation implements Signable {
      * @throws SQLException 
      */
     @Override
-    public synchronized void logOut(User user) throws SQLException{
+    public synchronized void logOut(User user) throws Exception{
         //Mensaje logger entrada de método logout.
         LOGGER.log(Level.INFO, "Método logout del Daoimplementation");
         //Guardar en el atributo de tipo Connection unna conexión de la pila.
@@ -145,6 +158,10 @@ public class DaoImplementation implements Signable {
         stmt = con.prepareStatement(ACTUALIZAR_ULTIMA_ENTRADA_USUARIO);
         //Añadir los valores al statement
         stmt.setTimestamp(1,Timestamp.valueOf(LocalDateTime.now()));
+        //Añadir los valores al statement
+        stmt.setString(2, user.getLogin());
+        //Añadir los valores al statement
+        stmt.setString(3, user.getPassword());
         //Liberar la conexión
         pool.freeConnection();
     }

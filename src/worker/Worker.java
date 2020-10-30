@@ -1,5 +1,5 @@
 /**
- * Contiene el Worker.
+ * Contiene el Worker. El hilo del servidor.
  */
 package worker;
 
@@ -36,14 +36,19 @@ public class Worker extends Thread implements Serializable{
     private Socket socketWorker;
     /**
      * Constructor de la clase. 
-     * @param socket Un socket.
      */
-    public Worker (Socket socket){
-        //Guardar el parámetro en el atributo de la clase.
-        socketWorker = socket;
-        //Iniciar el Hilo. Llamada al método run del hilo.
-        this.start();
+    public Worker (){
+ 
     }
+
+    public Socket getSocketWorker() {
+        return socketWorker;
+    }
+
+    public void setSocketWorker(Socket socketWorker) {
+        this.socketWorker = socketWorker;
+    }
+    
     /**
      * Método que ejecuta el hilo.
      */

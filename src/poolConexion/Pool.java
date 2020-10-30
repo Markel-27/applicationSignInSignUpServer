@@ -59,7 +59,7 @@ public class Pool {
      * Recoge una conexión de la pila. Utilizando el método pop de la clase Stack (pila)
      * @return Una conexion.
      */
-    public Connection getConnection (){
+    public synchronized Connection getConnection (){
         //Método del pool que el dao le pide una conexión
         LOGGER.log(Level.INFO, "Método getConnection del pool");
         //Pedir una conexión a la pila si está vacá añadir una.
@@ -76,7 +76,7 @@ public class Pool {
     /**
      * Devuelve una conexión a la pila con el método push de la clase Stack (Pila).
      */   
-    public void freeConnection (){
+    public synchronized void freeConnection (){
         LOGGER.log(Level.INFO, "Método freeConnection del pool");
        //Introduce una conexión en la pila.
        this.pilaContenedoraConexiones.push(con);
@@ -85,7 +85,7 @@ public class Pool {
     private void openConnection() {
         LOGGER.log(Level.INFO, "Método openConnection del pool.");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
-        ResourceBundle fichero = ResourceBundle.getBundle("datosconexionbasededatos");
+        ResourceBundle fichero = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
         //Guardar la información del fichero de propiedades en os atributos de la clase.
         String url = fichero.getString("Conn");
         String user = fichero.getString("DBUser");

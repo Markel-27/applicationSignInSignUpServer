@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import worker.Worker;
+import worker.WorkerLimiteSuperado;
 
 /**
  * Aplicación del servidor SignInSignUp. 
@@ -57,13 +58,17 @@ public class GrupoG52020ApplicationSignInSignUpServer {
         while (true){
             LOGGER.log(Level.INFO, "Bucle infinito del servidor atendiendo consultas de clientes.");
             //Si hay conexiones disponibles.
-            if(NUMERO_CONEXIONES_MAXIMAS > conexionesActuales ){
-                //Acepta el server socket una conexión y traslada la atención de esa conexión a un socket.
-                Socket unSocket = socketServidor.accept();
+            //Acepta el server socket una conexión y traslada la atención de esa conexión a un socket.
+            Socket unSocket = socketServidor.accept();
+            if(NUMERO_CONEXIONES_MAXIMAS > conexionesActuales ){              
                 //Sumar la conexión actual al atributo que controla las conexiones activas.
                 conexionesActuales++;
                 //Crear el hilo.
-                Worker worker = new Worker(unSocket);
+                Worker worker = new Worker();
+                //Pasar el socket a la clase hilo para que que se comunique con la aplicación cliente
+                worker.setSocketWorker(unSocket); 
+                //Iniciar ejecución del Hilo
+                worker.start();   
                 //Hacer un join al thread para que este programa espere a que el thread acabe para seguir.
                 try{
                     worker.join();
@@ -72,6 +77,13 @@ public class GrupoG52020ApplicationSignInSignUpServer {
                 }               
                 //El thread acaba, actualizar variable conexionesActuales.
                 conexionesActuales--;
+            }else{
+                WorkerLimiteSuperado workerSuperado = new WorkerLimiteSuperado(unSocket);  
+                try {
+                    workerSuperado.join();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GrupoG52020ApplicationSignInSignUpServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } 
                  
         }
