@@ -34,16 +34,22 @@ public class Worker extends Thread implements Serializable{
             Logger.getLogger("grupog5.signinsignupapplication.servidor.worker.thread");
     //Atributo Socket.
     private Socket socketWorker;
+
     /**
-     * Constructor de la clase. 
-     * @param socket Un socket.
+     * Recoge el atributo Socket.
+     * @return El atributo socket de la clase
      */
-    public Worker (Socket socket){
-        //Guardar el parámetro en el atributo de la clase.
-        socketWorker = socket;
-        //Iniciar el Hilo. Llamada al método run del hilo.
-        this.start();
+    public Socket getSocketWorker() {
+        return socketWorker;
     }
+    /**
+     * Asigna un Socjket recibido como parámetro al atributo de la clase Socket.
+     * @param socketWorker Un socket.
+     */
+    public void setSocketWorker(Socket socketWorker) {
+        this.socketWorker = socketWorker;
+    }
+   
     /**
      * Método que ejecuta el hilo.
      */
