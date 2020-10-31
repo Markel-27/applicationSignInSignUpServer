@@ -32,7 +32,9 @@ public class Worker extends Thread implements Serializable{
      */
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.worker.thread");
-    //Atributo Socket.
+    /**
+     * Un socket. Extremo servidor del socket para comunicar con el lado cliente.
+     */
     private Socket socketWorker;
 
     /**
@@ -43,7 +45,7 @@ public class Worker extends Thread implements Serializable{
         return socketWorker;
     }
     /**
-     * Asigna un Socjket recibido como parámetro al atributo de la clase Socket.
+     * Asigna un Socket recibido como parámetro al atributo de la clase Socket.
      * @param socketWorker Un socket.
      */
     public void setSocketWorker(Socket socketWorker) {
@@ -51,31 +53,30 @@ public class Worker extends Thread implements Serializable{
     }
    
     /**
-     * Método que ejecuta el hilo.
+     * Método que ejecuta el hilo. Arranca cuando un objeto de la clase ejecuta el método start(). 
      */
     public void run(){
         //Mensaje Logger al acceder al método
         LOGGER.log(Level.INFO, "Método run del hilo de la clase Worker");
-        //Instanciar un objeto Signable.
+        //Instanciar un objeto Signable. Método estático de la factoría.
         Signable dao = DaoFactory.getSignable();
         //Un usuario para guardar el usuario que leemos en el mensaje.
         User user = new User();
-        //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviado a traves de un socket.
+        //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviados a través de un socket.
         ObjectInputStream ois=null;
-        //Clase para escribir objetos. Y enviarlos a traves del socket.
+        //Clase para escribir objetos y enviarlos a traves del socket.
         ObjectOutputStream oos=null;
-        //Leer un mensaje recibido. Castear el objeto a Mensaje. ClassNot FoundException da esto.
-        Mensaje mensajeRecibido; //=new Mensaje(user,Accion.OK)
+        //Guartdar en un objeto de tipo Mensaje el objeto recibido.
+        Mensaje mensajeRecibido; 
         //Vamos a usar una instancia de mensaje diferente para el reenvio.
         Mensaje mensajeAEnviar = new Mensaje();
         //Try catch capturar los posibles errores cuando hay una consulta en la base de datos.
         try {
-            //Clase que deserializa objetos que se han escrito con ObjectOutputStream enviado a traves de un socket.
-            ois = new ObjectInputStream(socketWorker.getInputStream());
-            
+            //Inicializar el objeto ObjectInputStream
+            ois = new ObjectInputStream(socketWorker.getInputStream());          
             //Leer un mensaje recibido. Castear el objeto a Mensaje. ClassNot FoundException da esto.
             mensajeRecibido = (Mensaje) ois.readObject();
-            //Guardar en el atributo user el usuario leido en el mensaje.
+            //Guardar en la variable user el usuario leido en el mensaje.
             user = mensajeRecibido.getUser();
             //Estudiar las distintas opciones del mensaje recibido, hay 3 opciones Signin signup logout
             switch(mensajeRecibido.getAccion()){
@@ -97,15 +98,20 @@ public class Worker extends Thread implements Serializable{
                     mensajeAEnviar.setAccion(Accion.OK);
                     mensajeAEnviar.setUser(user);
                     break;
-                default:
+                case LOGOUT:
                     LOGGER.log(Level.INFO, "Recibida petición LogOut");
                     //Llamada al método logOut del Dao.
                     dao.logOut(user);
                     //Indicar en el mensaje que todo ha salido bien
                     mensajeAEnviar.setAccion(Accion.OK);                  
                     break;
+                default:
+                    //Si entra aquí es que la acción del mensaje no era ninguna de las anteriores por lo tanto no hacer nada y es un error enviar de vuelta el mensaje.
+                    //Indicar en el mensaje que todo ha salido bien
+                    mensajeAEnviar.setAccion(Accion.TIEMPO_EXPIRADO);              
+                    break;
             }
-        //Tratar las excepciones la base de datos puede lanzar las tres que hemos creado mas las existentes las englobamos con exception que es la padre.
+        //Tratar las excepciones la base de datos puede lanzar las tres que hemos creado mas las existentes las englobamos con exception que es la padre de todas.
         }catch(ExcepcionPasswdIncorrecta e){
             LOGGER.log(Level.INFO, "Entra al catch de ExceptionPasswordIncorrecta en el worker.");
             //Se ha producido un error indicar en el mensaje
@@ -119,29 +125,40 @@ public class Worker extends Thread implements Serializable{
             //Se ha producido un error indicar en el mensaje
             mensajeAEnviar.setAccion(Accion.USUARIO_NO_EXISTE);
         }catch(Exception e){
+            //Englobamos SQL, IO, Class ...
             LOGGER.log(Level.INFO, "Entra al catch de Exception en el worker.");
             //Se ha producido un error indicar en el mensaje
             mensajeAEnviar.setAccion(Accion.TIEMPO_EXPIRADO);
-        }
-        //Ahora enviar el mensaje a la aplicación cliente.
+        }finally{
+            //Ahora enviar el mensaje a la aplicación cliente. Método.
+            enviarMensajeVuelta(mensajeAEnviar,oos);  
+            //Cerrar los Streams
+            //Dentro de try catch dan error de IOException
+            try{
+                if(oos != null && ois != null){
+                    oos.close();
+                    ois.close();
+                }
+            }catch(IOException e){
+                LOGGER.log(Level.INFO, "Catch cerrando los Output/Input stream.");
+            }
+        } 
+        
+    }
+
+    /**
+     * Enviar un mensaje a través del socket a laa aplicación cliente.
+     * @param mensajeAEnviar Una instancia de mensaje
+     * @param oos Una instancia de ObjectOutputStream
+     */
+    private void enviarMensajeVuelta(Mensaje mensajeAEnviar, ObjectOutputStream oos) {
         try{
             //Clase para escribir objetos. Y enviarlos a traves del socket.
             oos = new ObjectOutputStream(socketWorker.getOutputStream());
            //Escribir en el socket el mensaje que va a ir al socket del cliente.
             oos.writeObject(mensajeAEnviar);
         }catch(IOException e){
-             LOGGER.log(Level.INFO, "Catch de esntada salida reenvio de mensaje de servidor a cliente.");
+             LOGGER.log(Level.INFO, "Catch de entrada salida reenvio de mensaje de servidor a cliente.");
         }
-        //Cerrar los Streams
-        finally{
-            //Dentro de try catch dan error de IOException
-            try{
-                oos.close();
-                ois.close();
-            }catch(IOException e){
-                LOGGER.log(Level.INFO, "Catch cerrando los Output/Input stream.");
-            }
-        } 
-        
     }
 }

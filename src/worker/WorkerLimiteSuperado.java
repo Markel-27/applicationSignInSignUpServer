@@ -27,14 +27,6 @@ public class WorkerLimiteSuperado extends Thread{
     private Mensaje mensaje;
     
     /**
-     * Constructor de la clase
-     * @param socket Extremo del socket por el que comunicarse con el cliente.
-     */
-    public WorkerLimiteSuperado(Socket socket){
-        setSocket(socket);
-    }
-
-    /**
      * Recoge un socket.
      * @return Un socket.
      */
@@ -51,7 +43,7 @@ public class WorkerLimiteSuperado extends Thread{
     }
     
     /**
-     * Método de ejecución del Hilo
+     * Método que ejecuta el hilo. Arranca cuando un objeto de la clase ejecuta el método start(). 
      */
     public void run(){
         //Añadimos la acción de error al mensaje

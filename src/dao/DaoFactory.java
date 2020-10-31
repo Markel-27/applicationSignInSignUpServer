@@ -17,7 +17,7 @@ public class DaoFactory {
      * @return Un Signable. 
      */
     public  static Signable getSignable(){
-        //Retorna la interfaz pero como la clase implemeta la interfaz.
+        //Retorna la interfaz pero new de la clase que implemeta la interfaz.
         return new DaoImplementation();
     }
 }

@@ -25,7 +25,7 @@ public class GrupoG52020ApplicationSignInSignUpServer {
     private static final Logger LOGGER = 
             Logger.getLogger("grupog5.signinsignupapplication.servidor.application");
     /**
-     * Leer los datos del fichero properties con la información de la base de datos.
+     * Leer los datos de un fichero properties.
      */
     private static final ResourceBundle FICHERO = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
     /**
@@ -78,15 +78,18 @@ public class GrupoG52020ApplicationSignInSignUpServer {
                 }               
                 //El thread acaba, actualizar variable conexionesActuales.
                 conexionesActuales--;
-                //El número de conesiones al servidor se han sobrepasado.
-            }else{
-                //Llamar al hilo, arranca en el constructor del propio hilo.
-                WorkerLimiteSuperado workerSuperado = new WorkerLimiteSuperado(unSocket);  
+            }else{//El número de conexiones al servidor se han sobrepasado.
+                //Inicializar una instancia de la clase workerLimiteSuperado.
+                WorkerLimiteSuperado workerSuperado = new WorkerLimiteSuperado(); 
+                //Enviar el socket al hilo para que este lo guarde en su atributo socket.
+                workerSuperado.setSocket(unSocket);
+                //Arranca el funcionamiento del hilo.
+                workerSuperado.start();
                 try {
                     //Esperar a que el hilo termine para seguir.
                     workerSuperado.join();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(GrupoG52020ApplicationSignInSignUpServer.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.SEVERE, "Error de interrupción del hilo worker limite superado.");
                 }
             } 
                  
