@@ -18,6 +18,11 @@ import mensaje.Mensaje;
  */
 public class WorkerLimiteSuperado extends Thread{
     /**
+     * Atributo Logger para rastrear los pasos de ejecución del programa.
+     */
+    private static final Logger LOGGER = 
+            Logger.getLogger("grupog5.signinsignupapplication.servidor.workerLimiteSuperado.thread");
+    /**
      * Un atributo Socket.
      */
     private Socket socket;
@@ -46,6 +51,8 @@ public class WorkerLimiteSuperado extends Thread{
      * Método que ejecuta el hilo. Arranca cuando un objeto de la clase ejecuta el método start(). 
      */
     public void run(){
+        //Mensaje Logger al acceder al método
+        LOGGER.log(Level.INFO, "Método run del hilo de la clase WorkerLimiteSuperado");
         //Añadimos la acción de error al mensaje
         mensaje.setAccion(Accion.TIEMPO_EXPIRADO);
         //Clase para escribir objetos. Y enviarlos a traves del socket.

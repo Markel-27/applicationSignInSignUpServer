@@ -162,6 +162,8 @@ public class DaoImplementation implements Signable {
         stmt.setString(2, user.getLogin());
         //Añadir los valores al statement
         stmt.setString(3, user.getPassword());
+        //El prepared stamtement ejecuta la instrucción un insert en este caso.
+        stmt.executeUpdate();
         //Liberar la conexión
         pool.freeConnection();
     }
