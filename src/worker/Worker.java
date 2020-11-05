@@ -1,8 +1,7 @@
-/**
- * Contiene el Worker.
- */
+
 package worker;
 
+import application.GrupoG52020ApplicationSignInSignUpServer;
 import dao.DaoFactory;
 import excepciones.ExcepcionPasswdIncorrecta;
 import excepciones.ExcepcionUserNoExiste;
@@ -27,7 +26,7 @@ import user.User;
  * @author Eneko, Endika, Markel
  */
 public class Worker extends Thread implements Serializable{
-    /**
+  /**
      * Atributo Logger para rastrear los pasos de ejecución del programa.
      */
     private static final Logger LOGGER = 
@@ -132,13 +131,15 @@ public class Worker extends Thread implements Serializable{
         }finally{
             //Ahora enviar el mensaje a la aplicación cliente. Método.
             enviarMensajeVuelta(mensajeAEnviar,oos);  
+            //Acaba el hilo y llamada al método estático de la clase principal para que actualice los hilos activos. Resta 1
+            GrupoG52020ApplicationSignInSignUpServer.restarConexiones();
             //Cerrar los Streams
             //Dentro de try catch dan error de IOException
             try{
-                if(oos != null && ois != null){
+                if(oos != null) 
                     oos.close();
-                    ois.close();
-                }
+                if(ois != null)
+                    ois.close();               
             }catch(IOException e){
                 LOGGER.log(Level.INFO, "Catch cerrando los Output/Input stream.");
             }

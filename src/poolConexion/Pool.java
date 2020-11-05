@@ -1,6 +1,4 @@
-/**
- * Contiene el pool de conexiones.
- */
+
 package poolConexion;
 
 import java.sql.Connection;
@@ -59,8 +57,9 @@ public class Pool {
     /**
      * Recoge una conexión de la pila. Utilizando el método pop de la clase Stack (pila)
      * @return Una conexion.
+     * @throws java.lang.Exception
      */
-    public Connection getConnection (){
+    public Connection getConnection ()throws Exception{
         //Método del pool que el dao le pide una conexión
         LOGGER.log(Level.INFO, "Método getConnection del pool");
         //Pedir una conexión a la pila si está vacá añadir una.
@@ -82,8 +81,11 @@ public class Pool {
        //Introduce una conexión en la pila.
        this.pilaContenedoraConexiones.push(con);
     }
-    //Meter las conexiones en el constructor en la pila?????
-    private void openConnection() {
+    /**
+     * Abre una conexión DriverManager con la base de datos.
+     * @throws Exception 
+     */
+    private void openConnection() throws Exception {
         LOGGER.log(Level.INFO, "Método openConnection del pool.");
         //Asocia el fichero de propiedades con el objeto de la clase Resource Bundle, clase que lee String del gichero de propiedades.
         ResourceBundle fichero = ResourceBundle.getBundle("poolConexion.datosconexionbasededatos");
@@ -92,11 +94,15 @@ public class Pool {
         String user = fichero.getString("DBUser");
         String passwd = fichero.getString("DBPass");
         String driver = fichero.getString("Driver");
-        try{
+        
+        try {
             Class.forName(driver);
             con = DriverManager.getConnection(url,user,passwd);
-        }catch(ClassNotFoundException | SQLException e){
-            LOGGER.log(Level.INFO, "Catch metodo openConnection del pool.");
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(Pool.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.INFO, "Catch del OpenConnection().");
+            throw  new Exception();
         }
+        
     }
 }

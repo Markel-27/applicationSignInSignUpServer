@@ -1,6 +1,4 @@
-/**
- * Contiene el Dao (Data Access Object) de la aplicación.
- */
+
 package dao;
 
 import interfaz.Signable;

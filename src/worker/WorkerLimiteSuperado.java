@@ -1,6 +1,4 @@
-/**
- *  Contiene el Worker.
- */
+
 package worker;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
